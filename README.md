@@ -9,24 +9,25 @@ Plataforma mínima estilo ngrok que cria túneis TCP via WebSocket. Um **cliente
 
 ## Fluxo do túnel
 1. Cliente abre WebSocket para `ws://<server>/ws`.
-2. Envia `auth { token }`; servidor responde `authenticated { client_id }`.
-3. Envia `create_tunnel`; recebe `tunnel_created { tunnel_id, status=waiting }`.
-4. Envia `connect_tunnel { tunnel_id }`; servidor sobe um `TcpListener` em porta dinâmica e responde `tunnel_connected { public_port, status=connected }`.
+2. Envia `{"Type":"Auth","Token":"..."}`; servidor responde `{"Type":"Authenticated","ClientId":"..."}`.
+3. Envia `{"Type":"CreateTunnel"}`; recebe `{"Type":"TunnelCreated","TunnelId":"...","Status":"waiting"}`.
+4. Envia `{"Type":"ConnectTunnel","TunnelId":"..."}`; servidor sobe um `TcpListener` dinâmico e responde `{"Type":"TunnelConnected","PublicPort":51987,"Status":"connected"}`.
 5. Tráfego:
-   - Conexões TCP externas entram pela `public_port`.
-   - Servidor encapsula bytes em `tcp_data { connection_id, data(base64), remote_ip }` → cliente.
-   - Cliente abre/recicla uma conexão local para o destino e devolve `tcp_data` na volta.
+   - Conexões TCP externas entram pela `PublicPort`.
+   - Servidor encapsula bytes em `{"Type":"TcpData","ConnectionId":"...","Data":"<base64>","RemoteIp":"..."}`
+   - Cliente cria/reutiliza conexão local para destino e devolve `TcpData` na volta (mesmo formato).
 6. Encerramento: queda do socket fecha túnel e conexões associadas.
 
 ## Protocolo de mensagens (JSON)
-- `auth { token }`
-- `authenticated { client_id }`
-- `create_tunnel`
-- `tunnel_created { tunnel_id, status }`
-- `connect_tunnel { tunnel_id }`
-- `tunnel_connected { tunnel_id, public_port, status }`
-- `tcp_data { connection_id, data(base64), remote_ip }` (bidirecional)
-- `error { message }`
+Valores de `Type` são **PascalCase**, conforme o `enum MessageType`:
+- `Auth { Token }`
+- `Authenticated { ClientId }`
+- `CreateTunnel`
+- `TunnelCreated { TunnelId, Status }`
+- `ConnectTunnel { TunnelId }`
+- `TunnelConnected { TunnelId, PublicPort, Status }`
+- `TcpData { ConnectionId, Data(base64), RemoteIp }` (bidirecional)
+- `Error { Message }`
 
 ## Pré-requisitos
 - .NET SDK **10.0** (TargetFramework `net10.0` em todos os projetos).
@@ -93,11 +94,11 @@ Abra um `tcp://localhost:51987` (HTTP, banco ou outro protocolo) e o tráfego se
 Usando `websocat` ou `wscat`:
 ```
 websocat ws://localhost:5000/ws
-{"type":"auth","token":"secret-token-1"}
-{"type":"create_tunnel"}
-{"type":"connect_tunnel","tunnel_id":"<id recebido>"}
+{"Type":"Auth","Token":"secret-token-1"}
+{"Type":"CreateTunnel"}
+{"Type":"ConnectTunnel","TunnelId":"<id recebido>"}
 ```
-Depois envie `tcp_data` manualmente com `connection_id` criado pelo servidor (apenas para depuração).
+Depois envie `TcpData` manualmente com o `ConnectionId` criado pelo servidor (apenas para depuração).
 
 ---
 Projeto criado como MVP de túnel TCP via WebSocket para desenvolvimento local e experimentos.
