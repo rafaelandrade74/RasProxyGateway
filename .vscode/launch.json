@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET TunnelServer",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/TunnelServer/bin/Debug/net10.0/TunnelServer.dll",
+            "cwd": "${workspaceFolder}/TunnelServer",
+            "preLaunchTask": "build TunnelServer",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET TunnelClient",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/TunnelClient/bin/Debug/net10.0/TunnelClient.dll",
+            "cwd": "${workspaceFolder}/TunnelClient",
+            "preLaunchTask": "build TunnelClient",
+            "stopAtEntry": false
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Server + Client",
+            "configurations": [
+                ".NET TunnelServer",
+                ".NET TunnelClient"
+            ],
+            "stopAll": true
+        }
+    ]
+}

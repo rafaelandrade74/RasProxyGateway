@@ -1,0 +1,21 @@
+# Build outputs
+bin/
+obj/
+
+# IDE
+.vs/
+
+# User-local
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Dotnet tooling
+.dotnet/
+.nuget/
+.templateengine/
+
+# VSCode settings cache
+.vscode/.history/

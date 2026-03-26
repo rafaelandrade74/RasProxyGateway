@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TunnelServer/TunnelServer.csproj" />
+  <Project Path="TunnelClient/TunnelClient.csproj" />
+  <Project Path="TunnelShared/TunnelShared.csproj" />
+</Solution>
