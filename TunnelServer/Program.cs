@@ -23,4 +23,4 @@ app.UseMiddleware<WebSocketMiddleware>();
 app.MapControllers();
 app.MapGet("/", () => Results.Ok(new { status = "ok", message = "Tunnel server running" }));
 
-app.Run();
+await app.RunAsync();
